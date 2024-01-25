@@ -6,8 +6,12 @@ Just a small client to make the necessary API endpoint testing.
 
 import requests
 
-endpoint = "http://localhost:8000"
+PORT = 8000
+DOMAIN = "127.0.0.1"
+API = "auth_api"
 
-get_response = requests.get(endpoint, json={"query": "Hello world!"})
+ENDPOINT = f"http://{DOMAIN}:{PORT}/{API}"
 
-print(get_response.status_code)
+response = requests.get(ENDPOINT, json={"query": "Hello world!"})
+
+print(response.text)

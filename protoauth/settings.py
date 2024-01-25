@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Add the apps, please and thank you.
-    "core.apps.CoreConfig",
+    "auth_api",
     # For the APIs.
     "rest_framework",
 ]
@@ -93,7 +93,7 @@ DATABASES = {
     )
 }
 
-AUTH_USER_MODEL = "core.User"
+AUTH_USER_MODEL = "auth_api.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
