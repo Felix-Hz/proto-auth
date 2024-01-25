@@ -43,6 +43,14 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Add the apps, please and thank you.
     "core.apps.CoreConfig",
+    # For the APIs.
+    "rest_framework",
+]
+
+# Use TOKEN or JWT authentication for the future. 
+AUTHENTICATION_CLASSES = [
+    "rest_framework.authentication.BasicAuthentication",
+    "rest_framework.authentication.SessionAuthentication",
 ]
 
 MIDDLEWARE = [
