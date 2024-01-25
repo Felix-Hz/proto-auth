@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "rest_framework",
 ]
 
-# Use TOKEN or JWT authentication for the future. 
+# Use TOKEN or JWT authentication for the future.
 AUTHENTICATION_CLASSES = [
     "rest_framework.authentication.BasicAuthentication",
     "rest_framework.authentication.SessionAuthentication",
@@ -93,6 +93,7 @@ DATABASES = {
     )
 }
 
+AUTH_USER_MODEL = "core.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
