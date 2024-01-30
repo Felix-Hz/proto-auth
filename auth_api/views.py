@@ -7,8 +7,6 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, get_user_model, logout
 from django.contrib import messages
 
-from .models import User
-
 
 def api_home(request, *args, **kwargs):
     return JsonResponse({"message": "Test response n1."})

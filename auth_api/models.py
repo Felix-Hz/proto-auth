@@ -20,16 +20,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-class Session(models.Model):
-    SessionID = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    LoginTime = models.DateTimeField(auto_now_add=True)
-    LogoutTime = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        db_table = "session"
-
-    def __str__(self):
-        return f"Session for {self.user} - {self.LoginTime}"
