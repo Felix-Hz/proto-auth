@@ -17,9 +17,10 @@ To integrate the `auth_api` app into my Django project, follow these steps:
 
 The `auth_api` app provides the following endpoints for user authentication and management:
 
-- `/api/auth/register/`: Register a new user.
-- `/api/auth/login/`: Log in an existing user.
-- `/api/auth/logout/`: Log out the current user.
+- `/auth_api/register/`: Register a new user.
+- `/auth_api/login/`: Log in an existing user.
+- `/auth_api/logout/`: Log out the current user.
+- `/auth_api/publish/`: Publish a post.
 
 <!--
                     --------------------
