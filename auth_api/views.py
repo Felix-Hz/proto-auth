@@ -51,3 +51,18 @@ class LoginAPIView(APIView):
             return Response({"token": token.key, "status": "Login was successful."})
         else:
             return Response({"error": "Invalid credentials"}, status=401)
+
+
+class LogoutAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        user = request.user
+
+        if user.is_authenticated:
+            logout(request)
+            if hasattr(user, "auth_token"):
+                user.auth_token.delete()
+            return Response({"message": "Logout successful"})
+        else:
+            return Response({"message": "User is already logged out"})
