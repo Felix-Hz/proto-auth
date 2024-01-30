@@ -1,4 +1,4 @@
-from .models import Post, Reaction
+from .models import Post, Reaction, Comment
 
 from django.contrib import messages
 from django.http import JsonResponse
@@ -163,5 +163,43 @@ class ReactPostAPIView(APIView):
         else:
             return Response(
                 {"error": "You need to sign in to react to a post."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+
+class AddCommentAPIView(APIView):
+    def post(self, request):
+        post_id, content = (
+            request.data.get("post_id"),
+            request.data.get("content"),
+        )
+
+        if request.user.is_authenticated:
+            if post_id and content:
+                post = Post.objects.filter(id=post_id).first()
+                if post:
+                    comment = Comment.objects.create(
+                        post=post, author_id=request.user.UserID, content=content
+                    )
+
+                    return Response(
+                        {
+                            "message": f"Comment added successfully. Request={request.user.UserID}"
+                        },
+                        status=status.HTTP_201_CREATED,
+                    )
+                else:
+                    return Response(
+                        {"error": "The specified post does not exist."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            else:
+                return Response(
+                    {"error": "The request lacks necessary information."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                {"error": "You need to sign in to add a comment."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )

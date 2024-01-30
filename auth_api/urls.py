@@ -8,4 +8,5 @@ urlpatterns = [
     path("logout/", views.LogoutAPIView.as_view(), name="logout"),
     path("publish/", views.PublishPostAPIView.as_view(), name="publish_post"),
     path("react/", views.ReactPostAPIView.as_view(), name="react_post"),
+    path("comment/", views.AddCommentAPIView.as_view(), name="comment_post"),
 ]
