@@ -34,6 +34,7 @@ class Post(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        db_table = "post"
 
     def __str__(self):
         return self.title
@@ -45,13 +46,20 @@ class Comment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        db_table = "comment"
+
     def __str__(self):
         return f"Comment by {self.author.username} on {self.post.title}"
 
 
-class Like(models.Model):
+class Reaction(models.Model):
     post = models.ForeignKey(Post, related_name="likes", on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    is_positive = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "reaction"
 
     def __str__(self):
         return f"{self.user.username} likes {self.post.title}"
