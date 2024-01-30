@@ -85,7 +85,7 @@ class PublishPostAPIView(APIView):
 
             # If it's unique:
             post = Post.objects.create(
-                title=title, content=content, author=request.user, image=image
+                title=title, content=content, author=request.user.UserID, image=image
             )
 
             return Response(
@@ -102,20 +102,19 @@ class PublishPostAPIView(APIView):
 
 class ReactPostAPIView(APIView):
     def post(self, request):
-        post_id, user_id, reaction_type = (
+        post_id, reaction_type = (
             request.data.get("post_id"),
-            request.data.get("user_id"),
             request.data.get("is_positive"),
         )
 
         if request.user.is_authenticated:
-            if post_id and user_id:
+            if post_id:
                 reaction_type = bool(reaction_type)
 
                 if reaction_type in [True, False]:
                     # See if the user had already reacted to this post:
                     existing_reaction = Reaction.objects.filter(
-                        post_id=post_id, user_id=user_id
+                        post_id=post_id, user_id=request.user.UserID
                     ).first()
 
                     if existing_reaction:
@@ -139,7 +138,9 @@ class ReactPostAPIView(APIView):
                     else:
                         # New reaction:
                         Reaction.objects.create(
-                            post_id=post_id, user_id=user_id, is_positive=reaction_type
+                            post_id=post_id,
+                            user_id=request.user.UserID,
+                            is_positive=reaction_type,
                         )
                         return Response(
                             {
@@ -155,7 +156,7 @@ class ReactPostAPIView(APIView):
             else:
                 return Response(
                     {
-                        "error": f"The request lacks necessary information. Received: post_id={post_id}, user_id={user_id}, reaction_type={reaction_type}"
+                        "error": f"The request lacks necessary information. Received: post_id={post_id}, reaction_type={reaction_type}"
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
