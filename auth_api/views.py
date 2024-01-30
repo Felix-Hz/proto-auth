@@ -1,28 +1,39 @@
+import django.middleware.csrf as csrf
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics, permissions
+from rest_framework import permissions
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model, logout
+from django.contrib import messages
 
 from .models import User
-from .serializers import UserSerializer
 
 
 def api_home(request, *args, **kwargs):
     return JsonResponse({"message": "Test response n1."})
 
 
-class RegistrationAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class RegistrationAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def perform_create(self, serializer):
-        user = serializer.save()
-        token = Token.objects.create(user=user)
-        response_data = {"token": token.key}
-        return Response(response_data)
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        if username and password:
+            User = get_user_model()
+            user = User.objects.create_user(username=username, password=password)
+
+            if user:
+                token, created = Token.objects.get_or_create(user=user)
+                response_data = {
+                    "status": "Registration was successful.",
+                    "token": token.key,
+                }
+                return Response(response_data)
+
+        return Response({"error": "Missing username or password"}, status=400)
 
 
 class LoginAPIView(APIView):
@@ -37,6 +48,6 @@ class LoginAPIView(APIView):
         if user:
             login(request, user)
             token, created = Token.objects.get_or_create(user=user)
-            return Response({"token": token.key})
+            return Response({"token": token.key, "status": "Login was successful."})
         else:
             return Response({"error": "Invalid credentials"}, status=401)
