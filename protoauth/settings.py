@@ -45,7 +45,21 @@ INSTALLED_APPS = [
     "auth_api",
     # For the APIs.
     "rest_framework",
+    "rest_framework.authtoken",
 ]
+
+AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.environ["DATABASE_URL"], engine="django_cockroachdb"
+    )
+}
+
+AUTH_USER_MODEL = "auth_api.User"
 
 # Use TOKEN or JWT authentication for the future.
 AUTHENTICATION_CLASSES = [
@@ -83,17 +97,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "protoauth.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ["DATABASE_URL"], engine="django_cockroachdb"
-    )
-}
-
-AUTH_USER_MODEL = "auth_api.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
