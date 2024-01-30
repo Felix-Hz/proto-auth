@@ -1,4 +1,4 @@
-from .models import Post
+from .models import Post, Reaction
 
 from django.contrib import messages
 from django.http import JsonResponse
@@ -97,4 +97,70 @@ class PublishPostAPIView(APIView):
             return Response(
                 {"error": "Title and content are required."},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class ReactPostAPIView(APIView):
+    def post(self, request):
+        post_id, user_id, reaction_type = (
+            request.data.get("post_id"),
+            request.data.get("user_id"),
+            request.data.get("is_positive"),
+        )
+
+        if request.user.is_authenticated:
+            if post_id and user_id:
+                reaction_type = bool(reaction_type)
+
+                if reaction_type in [True, False]:
+                    # See if the user had already reacted to this post:
+                    existing_reaction = Reaction.objects.filter(
+                        post_id=post_id, user_id=user_id
+                    ).first()
+
+                    if existing_reaction:
+                        # Only update the row if it's a different reaction_type.
+                        if existing_reaction.is_positive != reaction_type:
+                            existing_reaction.is_positive = reaction_type
+                            existing_reaction.save()
+                            return Response(
+                                {
+                                    "message": f"Reaction '{reaction_type}' updated successfully."
+                                },
+                                status=status.HTTP_200_OK,
+                            )
+                        else:
+                            return Response(
+                                {
+                                    "message": f"You have already reacted with '{reaction_type}'."
+                                },
+                                status=status.HTTP_200_OK,
+                            )
+                    else:
+                        # New reaction:
+                        Reaction.objects.create(
+                            post_id=post_id, user_id=user_id, is_positive=reaction_type
+                        )
+                        return Response(
+                            {
+                                "message": f"Reaction '{reaction_type}' stored successfully."
+                            },
+                            status=status.HTTP_201_CREATED,
+                        )
+                else:
+                    return Response(
+                        {"error": "The reaction needs a boolean value (0, 1)."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            else:
+                return Response(
+                    {
+                        "error": f"The request lacks necessary information. Received: post_id={post_id}, user_id={user_id}, reaction_type={reaction_type}"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                {"error": "You need to sign in to react to a post."},
+                status=status.HTTP_401_UNAUTHORIZED,
             )
