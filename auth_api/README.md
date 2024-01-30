@@ -22,6 +22,7 @@ The `auth_api` app provides the following endpoints for user authentication and 
 - `/auth_api/logout`: Log out the current user.
 - `/auth_api/publish`: Publish a post.
 - `/auth_api/react`: React to a post.
+- `/auth_api/comment`: Comment a post.
 
 <!--
                     --------------------
