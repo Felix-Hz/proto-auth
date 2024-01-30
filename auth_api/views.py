@@ -1,11 +1,12 @@
-import django.middleware.csrf as csrf
+from .models import Post
+
+from django.contrib import messages
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, get_user_model, logout
-from django.contrib import messages
 
 
 def api_home(request, *args, **kwargs):
@@ -64,3 +65,36 @@ class LogoutAPIView(APIView):
             return Response({"message": "Logout successful"})
         else:
             return Response({"message": "User is already logged out"})
+
+
+class PublishPostAPIView(APIView):
+    def post(self, request):
+        title, content = request.data.get("title"), request.data.get("content")
+        image = request.data.get("image") if "image" in request.data else None
+
+        if title and content:
+            # Check for duplicates:
+            existing_post = Post.objects.filter(title=title, content=content).exists()
+            if existing_post:
+                return Response(
+                    {
+                        "error": "This post has already been published. We're looking for unique creations."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # If it's unique:
+            post = Post.objects.create(
+                title=title, content=content, author=request.user, image=image
+            )
+
+            return Response(
+                {"message": f"Post '{title}' created successfully."},
+                status=status.HTTP_201_CREATED,
+            )
+
+        else:
+            return Response(
+                {"error": "Title and content are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
